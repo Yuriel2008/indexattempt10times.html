@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LingoFlow - Vietnamese & English Matching</title>
+    <style>
+        :root {
+            --primary-color: #3674B5;
+            --secondary-color: #1A2A80;
+            --card-bg-color: #FFFFFF;
+            --text-color: #333;
+            --light-text-color: #F0F0F0;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+            --selected-color: #f0ad4e;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--light-text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            padding: 2rem;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 0 2.5rem; /* Space for the menu icon */
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        /* Menu Icon */
+        .menu-icon {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 30px;
+            height: 24px;
+        }
+
+        .menu-icon .line {
+            width: 100%;
+            height: 3px;
+            background-color: var(--light-text-color);
+            border-radius: 3px;
+        }
+
+        /* Tools Menu Dropdown */
+        .tools-menu {
+            display: none;
+            position: absolute;
+            top: 4.5rem;
+            right: 2rem;
+            background-color: var(--card-bg-color);
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            z-index: 1000;
+            width: 300px;
+            padding: 1rem;
+            color: var(--text-color);
+        }
+
+        .tools-menu.show {
+            display: block;
+        }
+        
+        /* Learn Section - Matching Game */
+        #learn-section {
+            text-align: center;
+        }
+
+        .matching-area {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background-color: var(--card-bg-color);
+            color: var(--text-color);
+            border-radius: 15px;
+            padding: 2rem;
+            min-height: 250px;
+            box-sizing: border-box;
+        }
+
+        .matching-column {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 45%;
+        }
+
+        .match-item {
+            padding: 1rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .match-item:hover {
+            background-color: rgba(54, 116, 181, 0.1);
+        }
+
+        .match-item.selected {
+            background-color: var(--selected-color);
+            border-color: var(--selected-color);
+            color: #fff;
+        }
+
+        .match-item.correct {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+            color: #fff;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .match-item.incorrect {
+            animation: shake 0.5s;
+            background-color: var(--error-color);
+            border-color: var(--error-color);
+            color: #fff;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+
+        #feedback {
+            margin-top: 1rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            height: 20px;
+        }
+        
+        .main-controls {
+            margin-top: 1rem;
+        }
+
+        .action-button {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 8px;
+            border: none;
+            background-color: var(--selected-color);
+            color: #fff;
+            transition: all 0.3s;
+            display: none; /* Hidden by default */
+        }
+        
+        .action-button.show {
+            display: inline-block;
+        }
+
+        .tool-card { margin-bottom: 1rem; }
+        .tool-card:last-child { margin-bottom: 0; }
+        .tool-card h3 { margin-top: 0; border-bottom: 2px solid var(--primary-color); padding-bottom: 0.5rem; color: var(--secondary-color); font-size: 1.1rem; }
+        #quick-notes-textarea { width: 100%; height: 100px; border-radius: 8px; border: 1px solid #ccc; padding: 0.5rem; font-family: inherit; box-sizing: border-box; }
+        .progress-tracker ul, .habit-tracker ul { list-style: none; padding: 0; margin: 0; }
+        .habit-tracker li, .progress-tracker li { margin-bottom: 0.5rem; font-size: 0.9rem; }
+        .progress-tracker span { font-weight: bold; }
+        .habit-tracker li label { display: flex; align-items: center; }
+        .habit-tracker input[type="checkbox"] { margin-right: 0.5rem; }
+
+        @media (max-width: 600px) {
+            .matching-area { flex-direction: column; gap: 1rem; }
+            .matching-column { width: 100%; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div class="menu-icon" id="menu-icon" onclick="toggleMenu()">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+        </div>
+
+        <div class="tools-menu" id="tools-menu">
+            <!-- Tools content remains the same -->
+        </div>
+
+        <header>
+            <h1>LingoFlow</h1>
+            <p>Connect the words to their meanings.</p>
+        </header>
+
+        <main id="learn-section">
+            <div class="matching-area">
+                <div class="matching-column" id="meanings-column">
+                    <!-- Meanings will be dynamically inserted -->
+                </div>
+                <div class="matching-column" id="words-column">
+                    <!-- Words will be dynamically inserted -->
+                </div>
+            </div>
+
+            <div id="feedback"></div>
+            <div class="main-controls">
+                <button class="action-button" id="next-level-btn" onclick="nextLevel()">Next Level</button>
+            </div>
+        </main>
+
+    </div>
+
+    <script>
+        // Data is now structured in levels, each with 3 pairs
+        const levels = [
+            [
+                { id: 1, meaning: 'to gain knowledge', word: 'học' },
+                { id: 2, meaning: 'a book', word: 'quyển sách' },
+                { id: 3, meaning: 'to eat', word: 'ăn' }
+            ],
+            [
+                { id: 4, meaning: 'water', word: 'nước' },
+                { id: 5, meaning: 'hello', word: 'xin chào' },
+                { id: 6, meaning: 'thank you', word: 'cảm ơn' }
+            ],
+            [
+                { id: 7, meaning: 'goodbye', word: 'tạm biệt' },
+                { id: 8, meaning: 'house', word: 'nhà' },
+                { id: 9, meaning: 'teacher', word: 'giáo viên' }
+            ]
+        ];
+
+        let currentLevelIndex = 0;
+        let selectedItem = null;
+        let matchesFound = 0;
+
+        const meaningsColumn = document.getElementById('meanings-column');
+        const wordsColumn = document.getElementById('words-column');
+        const nextLevelBtn = document.getElementById('next-level-btn');
+        const menu = document.getElementById('tools-menu');
+        const menuIcon = document.getElementById('menu-icon');
+
+        // Utility to shuffle an array
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        function loadLevel(levelIndex) {
+            matchesFound = 0;
+            const levelData = levels[levelIndex];
+            
+            // Clear previous items and hide button
+            meaningsColumn.innerHTML = '';
+            wordsColumn.innerHTML = '';
+            nextLevelBtn.classList.remove('show');
+
+            // Separate and shuffle meanings and words
+            const meanings = shuffle(levelData.map(item => ({ text: item.meaning, id: item.id })));
+            const words = shuffle(levelData.map(item => ({ text: item.word, id: item.id })));
+
+            // Create and append items to columns
+            meanings.forEach(item => createMatchItem(item, meaningsColumn));
+            words.forEach(item => createMatchItem(item, wordsColumn));
+        }
+
+        function createMatchItem(itemData, column) {
+            const item = document.createElement('div');
+            item.className = 'match-item';
+            item.textContent = itemData.text;
+            item.dataset.id = itemData.id;
+            item.dataset.column = column.id;
+            item.addEventListener('click', () => onItemClick(item));
+            column.appendChild(item);
+        }
+
+        function onItemClick(item) {
+            if (item.classList.contains('correct')) return; // Already matched
+
+            if (!selectedItem) {
+                // First selection
+                selectedItem = item;
+                item.classList.add('selected');
+            } else {
+                // Second selection
+                if (selectedItem === item || selectedItem.dataset.column === item.dataset.column) {
+                    // Deselect if clicking the same item or an item in the same column
+                    selectedItem.classList.remove('selected');
+                    selectedItem = null;
+                    return;
+                }
+
+                // Check for a match
+                if (selectedItem.dataset.id === item.dataset.id) {
+                    // It's a match!
+                    selectedItem.classList.add('correct');
+                    item.classList.add('correct');
+                    selectedItem.classList.remove('selected');
+                    matchesFound++;
+                    selectedItem = null;
+                    
+                    if (matchesFound === 3) {
+                        nextLevelBtn.classList.add('show');
+                    }
+                } else {
+                    // It's not a match
+                    selectedItem.classList.add('incorrect');
+                    item.classList.add('incorrect');
+                    
+                    // Reset after a short delay
+                    setTimeout(() => {
+                        selectedItem.classList.remove('incorrect', 'selected');
+                        item.classList.remove('incorrect');
+                        selectedItem = null;
+                    }, 500);
+                }
+            }
+        }
+        
+        function nextLevel() {
+            currentLevelIndex = (currentLevelIndex + 1) % levels.length;
+            loadLevel(currentLevelIndex);
+        }
+        
+        function toggleMenu() {
+            menu.classList.toggle('show');
+        }
+
+        window.onclick = function(event) {
+            if (!menu.contains(event.target) && !menuIcon.contains(event.target)) {
+                if (menu.classList.contains('show')) {
+                    menu.classList.remove('show');
+                }
+            }
+        }
+        
+        // Initialize first level on page load
+        window.onload = () => {
+            loadLevel(currentLevelIndex);
+            // You can re-add the menu tools HTML here if needed
+            document.getElementById('tools-menu').innerHTML = `
+                <div class="tool-card progress-tracker">
+                    <h3>Progress Tracker</h3>
+                    <ul>
+                        <li>Levels Completed: <span id="levels-completed">0</span></li>
+                    </ul>
+                </div>
+                <div class="tool-card habit-tracker">
+                    <h3>Habit Tracker</h3>
+                    <ul>
+                        <li><label><input type="checkbox"> Practiced matching</label></li>
+                    </ul>
+                </div>
+                <div class="tool-card">
+                    <h3>Quick Notes</h3>
+                    <textarea id="quick-notes-textarea" placeholder="Write down new words or phrases..."></textarea>
+                </div>`;
+        };
+    </script>
+</body>
+</html>

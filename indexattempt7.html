@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LingoFlow - Professional Edition</title>
+    <style>
+        /* CSS remains largely the same as it's already well-structured with variables */
+        :root {
+            --primary-color: #3674B5;
+            --secondary-color: #1A2A80;
+            --card-bg-color: #FFFFFF;
+            --text-color: #333;
+            --light-text-color: #F0F0F0;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+            --selected-color: #f0ad4e;
+            --review-color: #6a3093;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--light-text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            padding: 2rem;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding: 0 2.5rem;
+        }
+
+        header h1 { margin: 0; font-size: 2.5rem; }
+
+        .menu-icon { position: absolute; top: 2rem; right: 2rem; cursor: pointer; z-index: 1001; display: flex; flex-direction: column; justify-content: space-around; width: 30px; height: 24px; }
+        .menu-icon .line { width: 100%; height: 3px; background-color: var(--light-text-color); border-radius: 3px; }
+
+        .tools-menu { display: none; position: absolute; top: 4.5rem; right: 2rem; background-color: var(--card-bg-color); border-radius: 15px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); z-index: 1000; width: 300px; padding: 1rem; color: var(--text-color); }
+        .tools-menu.show { display: block; }
+        
+        #learn-section { text-align: center; }
+        
+        .difficulty-selector { display: flex; justify-content: center; margin-bottom: 1.5rem; background-color: rgba(0, 0, 0, 0.2); border-radius: 10px; padding: 0.3rem; }
+        .difficulty-btn { flex: 1; padding: 0.75rem 0; cursor: pointer; border: none; background-color: transparent; color: var(--light-text-color); font-size: 1rem; font-weight: bold; border-radius: 7px; transition: background-color 0.3s; }
+        .difficulty-btn.active { background-color: var(--primary-color); box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); }
+        #btn-review.active { background-color: var(--review-color); }
+
+        .matching-area { display: flex; justify-content: space-around; align-items: stretch; background-color: var(--card-bg-color); color: var(--text-color); border-radius: 15px; padding: 2rem; min-height: 250px; box-sizing: border-box; }
+        .matching-column { display: flex; flex-direction: column; gap: 1rem; width: 45%; }
+        .match-item { padding: 1rem; border: 2px solid var(--primary-color); border-radius: 8px; cursor: pointer; transition: all 0.3s ease; font-size: 1.1rem; font-weight: 500; min-height: 2.5rem; display: flex; justify-content: center; align-items: center; flex-grow: 1; text-align: center; }
+        .match-item:hover { background-color: rgba(54, 116, 181, 0.1); }
+        .match-item.selected { background-color: var(--selected-color); border-color: var(--selected-color); color: #fff; }
+        .match-item.correct { background-color: var(--success-color); border-color: var(--success-color); color: #fff; cursor: not-allowed; opacity: 0.7; }
+        .match-item.incorrect { animation: shake 0.5s; background-color: var(--error-color); border-color: var(--error-color); color: #fff; }
+
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+        #feedback { margin-top: 1rem; font-size: 1.2rem; font-weight: bold; height: 20px; }
+        
+        .main-controls { margin-top: 1rem; }
+        .action-button { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: bold; cursor: pointer; border-radius: 8px; border: none; background-color: var(--selected-color); color: #fff; transition: all 0.3s; display: none; }
+        .action-button.show { display: inline-block; }
+
+        .modal-overlay { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
+        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 2rem; border: 1px solid #888; width: 80%; max-width: 600px; border-radius: 15px; position: relative; color: var(--text-color); }
+        .close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        #archive-list { list-style: none; padding: 0; max-height: 400px; overflow-y: auto; }
+        #archive-list li { padding: 0.75rem; border-bottom: 1px solid #ddd; }
+
+        @media (max-width: 600px) {
+            .difficulty-selector { flex-wrap: wrap; }
+            .difficulty-btn { font-size: 0.9rem; flex-basis: 50%; }
+            .matching-area { flex-direction: column; gap: 1rem; }
+            .matching-column { width: 100%; }
+            .modal-content { width: 90%; margin: 20% auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="menu-icon" id="menu-icon">
+            <div class="line"></div><div class="line"></div><div class="line"></div>
+        </div>
+        <div class="tools-menu" id="tools-menu"></div>
+        <header>
+            <h1>LingoFlow</h1>
+            <p>Connect the words to their meanings.</p>
+        </header>
+        <main id="learn-section">
+            <div class="difficulty-selector" id="difficulty-selector">
+                <button id="btn-easy" class="difficulty-btn active" data-difficulty="easy">Easy</button>
+                <button id="btn-medium" class="difficulty-btn" data-difficulty="medium">Medium</button>
+                <button id="btn-hard" class="difficulty-btn" data-difficulty="hard">Hard</button>
+                <button id="btn-review" class="difficulty-btn" data-difficulty="review">Smart Review</button>
+            </div>
+            <div class="matching-area">
+                <div class="matching-column" id="words-column"></div>
+                <div class="matching-column" id="meanings-column"></div>
+            </div>
+            <div id="feedback" aria-live="polite"></div>
+            <div class="main-controls">
+                <button class="action-button" id="next-level-btn">Next Round</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Archive Modal HTML -->
+    <div id="archive-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-btn" id="close-archive-btn">×</span>
+            <h2>Word Archive</h2>
+            <ul id="archive-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        'use strict';
+
+        /**
+         * LingoFlow Application Object
+         * Encapsulates all application logic, state, and UI elements.
+         */
+        const LingoFlow = {
+            // Application State
+            state: {
+                currentDifficulty: 'easy',
+                currentLevelIndex: 0,
+                selectedItem: null,
+                matchesFound: 0,
+                currentLevelData: [],
+                wordBank: new Map()
+            },
+
+            // Cached DOM Elements
+            elements: {},
+
+            // Application Data
+            gameData: {
+                 easy: [[{id:1,word:"học",meaning:"to learn"},{id:2,word:"quyển sách",meaning:"a book"},{id:3,word:"ăn",meaning:"to eat"}],[{id:4,word:"nước",meaning:"water"},{id:5,word:"nhà",meaning:"house"},{id:6,word:"giáo viên",meaning:"teacher"}],[{id:30,word:"con chó",meaning:"dog"},{id:31,word:"con mèo",meaning:"cat"},{id:32,word:"đi",meaning:"to go"}],[{id:33,word:"trường học",meaning:"school"},{id:34,word:"màu đỏ",meaning:"red color"},{id:35,word:"số một",meaning:"number one"}],[{id:36,word:"cái cây",meaning:"tree"},{id:37,word:"bóng đá",meaning:"soccer"},{id:38,word:"mặt trời",meaning:"sun"}]],
+                medium: [[{id:10,word:"sinh viên",meaning:"student"},{id:11,word:"viết",meaning:"to write"},{id:12,word:"ngon",meaning:"delicious"}],[{id:13,word:"bệnh viện",meaning:"hospital"},{id:14,word:"máy tính",meaning:"computer"},{id:15,word:"bạn bè",meaning:"friends"}],[{id:40,word:"gia đình",meaning:"family"},{id:41,word:"hôm nay",meaning:"today"},{id:42,word:"uống",meaning:"to drink"}],[{id:43,word:"nhà hàng",meaning:"restaurant"},{id:44,word:"xinh đẹp",meaning:"beautiful"},{id:45,word:"buổi sáng",meaning:"morning"}],[{id:46,word:"thành phố",meaning:"city"},{id:47,word:"nói chuyện",meaning:"to talk"},{id:48,word:"thông minh",meaning:"intelligent"}]],
+                hard: [[{id:20,word:"Bạn có khỏe không?",meaning:"How are you?"},{id:21,word:"Tôi đói bụng",meaning:"I am hungry"},{id:22,word:"Hẹn gặp lại",meaning:"See you later"}],[{id:23,word:"Thời tiết hôm nay thế nào?",meaning:"How is the weather today?"},{id:24,word:"Chúc một ngày tốt lành",meaning:"Have a nice day"},{id:25,word:"Tên của bạn là gì?",meaning:"What is your name?"}],[{id:50,word:"Cái này giá bao nhiêu?",meaning:"How much does this cost?"},{id:51,word:"Nhà vệ sinh ở đâu?",meaning:"Where is the bathroom?"},{id:52,word:"Tôi không hiểu",meaning:"I don't understand"}],[{id:53,word:"Rất vui được gặp bạn",meaning:"Pleased to meet you"},{id:54,word:"Bạn có thể nói chậm hơn không?",meaning:"Can you speak slower?"},{id:55,word:"Chúc may mắn",meaning:"Good luck"}],[{id:56,word:"Mấy giờ rồi?",meaning:"What time is it?"},{id:57,word:"Tôi cần sự giúp đỡ",meaning:"I need help"},{id:58,word:"Sân bay ở đâu?",meaning:"Where is the airport?"}]]
+            },
+
+            /**
+             * Initializes the application.
+             * Caches elements, sets up the word bank, binds event listeners, and loads the first level.
+             */
+            init() {
+                // 1. Cache all DOM elements for performance
+                this.elements = {
+                    wordsColumn: document.getElementById('words-column'),
+                    meaningsColumn: document.getElementById('meanings-column'),
+                    nextLevelBtn: document.getElementById('next-level-btn'),
+                    feedback: document.getElementById('feedback'),
+                    menu: document.getElementById('tools-menu'),
+                    menuIcon: document.getElementById('menu-icon'),
+                    archiveModal: document.getElementById('archive-modal'),
+                    closeArchiveBtn: document.getElementById('close-archive-btn'),
+                    archiveList: document.getElementById('archive-list'),
+                    difficultySelector: document.getElementById('difficulty-selector')
+                };
+
+                // 2. Populate the wordBank with SRS data
+                const masterList = Object.values(this.gameData).flat(2);
+                masterList.forEach(word => this.state.wordBank.set(word.id, {...word, lastSeen: 0}));
+
+                // 3. Bind all event listeners
+                this._bindEvents();
+
+                // 4. Load the initial level
+                this._loadLevel();
+            },
+
+            /**
+             * Centralized event binding.
+             */
+            _bindEvents() {
+                this.elements.difficultySelector.addEventListener('click', this._handleDifficultyChange.bind(this));
+                this.elements.nextLevelBtn.addEventListener('click', this._handleNextLevel.bind(this));
+                this.elements.menuIcon.addEventListener('click', this._toggleMenu.bind(this));
+                this.elements.closeArchiveBtn.addEventListener('click', this._closeArchive.bind(this));
+                
+                // Use event delegation for dynamically created match items
+                this.elements.wordsColumn.addEventListener('click', this._handleItemClick.bind(this));
+                this.elements.meaningsColumn.addEventListener('click', this._handleItemClick.bind(this));
+                
+                // Global event listeners
+                window.addEventListener('click', (event) => {
+                    if (event.target === this.elements.archiveModal) this._closeArchive();
+                    if (!this.elements.menu.contains(event.target) && !this.elements.menuIcon.contains(event.target)) {
+                        this.elements.menu.classList.remove('show');
+                    }
+                });
+            },
+
+            /**
+             * Loads a new level based on the current state (difficulty and level index).
+             */
+            _loadLevel() {
+                this.state.matchesFound = 0;
+                this.state.selectedItem = null;
+
+                if (this.state.currentDifficulty === 'review') {
+                    this.state.currentLevelData = this._generateSmartReviewData();
+                } else {
+                    this.state.currentLevelData = this.gameData[this.state.currentDifficulty][this.state.currentLevelIndex];
+                }
+
+                this._renderLevel();
+            },
+
+            /**
+             * Renders the UI for the current level.
+             */
+            _renderLevel() {
+                this.elements.wordsColumn.innerHTML = '';
+                this.elements.meaningsColumn.innerHTML = '';
+                this._updateFeedback('', false);
+                this.elements.nextLevelBtn.classList.remove('show');
+
+                const createMatchItem = (itemData) => {
+                    const item = document.createElement('div');
+                    item.className = 'match-item';
+                    item.textContent = itemData.text;
+                    item.dataset.id = itemData.id;
+                    return item;
+                };
+
+                const words = this._shuffle(this.state.currentLevelData.map(item => ({ text: item.word, id: item.id })));
+                const meanings = this._shuffle(this.state.currentLevelData.map(item => ({ text: item.meaning, id: item.id })));
+
+                words.forEach(item => this.elements.wordsColumn.appendChild(createMatchItem(item)));
+                meanings.forEach(item => this.elements.meaningsColumn.appendChild(createMatchItem(item)));
+            },
+
+            _handleDifficultyChange(event) {
+                const target = event.target.closest('.difficulty-btn');
+                if (!target) return;
+
+                this.state.currentDifficulty = target.dataset.difficulty;
+                this.state.currentLevelIndex = 0;
+                
+                document.querySelectorAll('.difficulty-btn').forEach(btn => btn.classList.remove('active'));
+                target.classList.add('active');
+                
+                this._loadLevel();
+            },
+            
+            _handleItemClick(event) {
+                const item = event.target.closest('.match-item');
+                if (!item || item.classList.contains('correct')) return;
+
+                if (!this.state.selectedItem) {
+                    this.state.selectedItem = item;
+                    item.classList.add('selected');
+                } else {
+                    if (this.state.selectedItem === item || this.state.selectedItem.parentElement === item.parentElement) {
+                        this.state.selectedItem.classList.remove('selected');
+                        this.state.selectedItem = null;
+                        return;
+                    }
+
+                    if (this.state.selectedItem.dataset.id === item.dataset.id) { // Match
+                        const matchedId = parseInt(item.dataset.id);
+                        this.state.wordBank.get(matchedId).lastSeen = Date.now();
+
+                        this.state.selectedItem.classList.add('correct');
+                        item.classList.add('correct');
+                        this.state.matchesFound++;
+                        
+                        // Clear selection and check for level completion
+                        this.state.selectedItem = null;
+                        if (this.state.matchesFound === this.state.currentLevelData.length) {
+                            this._updateFeedback('Round Complete!', true);
+                            this.elements.nextLevelBtn.classList.add('show');
+                        }
+                    } else { // No match
+                        this.state.selectedItem.classList.add('incorrect');
+                        item.classList.add('incorrect');
+                        
+                        const selected = this.state.selectedItem; // store temporarily
+                        setTimeout(() => {
+                            selected.classList.remove('incorrect', 'selected');
+                            item.classList.remove('incorrect');
+                        }, 500);
+                        this.state.selectedItem = null;
+                    }
+                }
+            },
+
+            _handleNextLevel() {
+                if (this.state.currentDifficulty !== 'review') {
+                    const levels = this.gameData[this.state.currentDifficulty].length;
+                    this.state.currentLevelIndex = (this.state.currentLevelIndex + 1) % levels;
+                }
+                this._loadLevel();
+            },
+            
+            _updateFeedback(message, isSuccess) {
+                this.elements.feedback.textContent = message;
+                this.elements.feedback.style.color = isSuccess ? 'var(--success-color)' : 'var(--error-color)';
+            },
+
+            _generateSmartReviewData() {
+                const seenWords = Array.from(this.state.wordBank.values()).filter(word => word.lastSeen > 0);
+                const unseenWords = Array.from(this.state.wordBank.values()).filter(word => word.lastSeen === 0);
+
+                // Prioritize words that have been seen but not recently.
+                seenWords.sort((a, b) => a.lastSeen - b.lastSeen); 
+                
+                // Combine lists: oldest seen words first, then unseen words.
+                const reviewPool = [...seenWords, ...unseenWords];
+
+                return reviewPool.slice(0, 3);
+            },
+            
+            _shuffle: (array) => array.sort(() => Math.random() - 0.5),
+
+            // --- Menu and Modal Methods ---
+            _toggleMenu() {
+                this._renderMenu();
+                this.elements.menu.classList.toggle('show');
+            },
+
+            _renderMenu() {
+                // Dynamically render menu content
+                this.elements.menu.innerHTML = `
+                    <div class="tool-card">
+                        <h3>Word Archive</h3>
+                        <p>Review all words you've practiced.</p>
+                        <button id="archive-btn-dynamic">View Archive</button>
+                    </div>
+                    <div class="tool-card">
+                        <h3>Quick Notes</h3>
+                        <textarea placeholder="Write notes here..."></textarea>
+                    </div>`;
+                document.getElementById('archive-btn-dynamic').addEventListener('click', this._openArchive.bind(this));
+            },
+            
+            _openArchive() {
+                this.elements.archiveList.innerHTML = '';
+                this.elements.menu.classList.remove('show');
+
+                const seenWords = Array.from(this.state.wordBank.values()).filter(word => word.lastSeen > 0);
+                if (seenWords.length === 0) {
+                    this.elements.archiveList.innerHTML = '<li>No words practiced yet. Complete a match!</li>';
+                } else {
+                    seenWords.sort((a, b) => b.lastSeen - a.lastSeen); // Most recent first
+                    seenWords.forEach(item => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<strong>${item.word}</strong> = <em>${item.meaning}</em>`;
+                        this.elements.archiveList.appendChild(li);
+                    });
+                }
+                this.elements.archiveModal.style.display = 'block';
+            },
+
+            _closeArchive() {
+                this.elements.archiveModal.style.display = 'none';
+            }
+        };
+
+        // Start the application once the DOM is fully loaded.
+        document.addEventListener('DOMContentLoaded', () => {
+            LingoFlow.init();
+        });
+
+    </script>
+</body>
+</html>
