@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,7 +20,10 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background-color: var(--secondary-color);
+            background-image: radial-gradient(circle at 15% 50%, rgba(54, 116, 181, 0.3) 0%, transparent 40%),
+                radial-gradient(circle at 85% 30%, rgba(54, 116, 181, 0.2) 0%, transparent 50%);
+            background-repeat: no-repeat;
             color: var(--light-text-color);
             display: flex;
             justify-content: center;
@@ -32,7 +36,7 @@
         .container {
             width: 100%;
             max-width: 800px;
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.2);
             border-radius: 15px;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
             backdrop-filter: blur(5px);
@@ -43,63 +47,309 @@
         }
 
         header {
-            text-align: center;
+            text-align: left;
             margin-bottom: 1.5rem;
-            padding: 0 2.5rem;
+            padding: 0;
         }
 
-        header h1 { margin: 0; font-size: 2.5rem; }
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
 
-        .menu-icon { position: absolute; top: 2rem; right: 2rem; cursor: pointer; z-index: 1001; display: flex; flex-direction: column; justify-content: space-around; width: 30px; height: 24px; }
-        .menu-icon .line { width: 100%; height: 3px; background-color: var(--light-text-color); border-radius: 3px; }
+        .menu-icon {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 30px;
+            height: 24px;
+        }
 
-        .tools-menu { display: none; position: absolute; top: 4.5rem; right: 2rem; background-color: var(--card-bg-color); border-radius: 15px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); z-index: 1000; width: 300px; padding: 1rem; color: var(--text-color); }
-        .tools-menu.show { display: block; }
-        
-        #learn-section { text-align: center; }
-        
-        .difficulty-selector { display: flex; justify-content: center; margin-bottom: 1.5rem; background-color: rgba(0, 0, 0, 0.2); border-radius: 10px; padding: 0.3rem; }
-        .difficulty-btn { flex: 1; padding: 0.75rem 0; cursor: pointer; border: none; background-color: transparent; color: var(--light-text-color); font-size: 1rem; font-weight: bold; border-radius: 7px; transition: background-color 0.3s; }
-        .difficulty-btn.active { background-color: var(--primary-color); box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); }
+        .menu-icon .line {
+            width: 100%;
+            height: 3px;
+            background-color: var(--light-text-color);
+            border-radius: 3px;
+        }
 
-        .matching-area { display: flex; justify-content: space-around; align-items: stretch; background-color: var(--card-bg-color); color: var(--text-color); border-radius: 15px; padding: 2rem; min-height: 250px; box-sizing: border-box; }
-        .matching-column { display: flex; flex-direction: column; gap: 1rem; width: 45%; }
-        .match-item { padding: 1rem; border: 2px solid var(--primary-color); border-radius: 8px; cursor: pointer; transition: all 0.3s ease; font-size: 1.1rem; font-weight: 500; min-height: 2.5rem; display: flex; justify-content: center; align-items: center; flex-grow: 1; text-align: center; }
-        .match-item:hover { background-color: rgba(54, 116, 181, 0.1); }
-        .match-item.selected { background-color: var(--selected-color); border-color: var(--selected-color); color: #fff; }
-        .match-item.correct { background-color: var(--success-color); border-color: var(--success-color); color: #fff; cursor: not-allowed; opacity: 0.7; }
-        .match-item.incorrect { animation: shake 0.5s; background-color: var(--error-color); border-color: var(--error-color); color: #fff; }
+        .tools-menu {
+            display: none;
+            position: fixed;
+            top: 4.5rem;
+            right: 2rem;
+            background-color: #DEE8CE;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            width: 300px;
+            padding: 1rem;
+            color: var(--text-color);
+        }
 
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .tools-menu.show {
+            display: block;
+        }
 
-        #feedback { margin-top: 1rem; font-size: 1.2rem; font-weight: bold; height: 20px; }
-        
-        .main-controls { margin-top: 1rem; }
-        .action-button { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: bold; cursor: pointer; border-radius: 8px; border: none; background-color: var(--selected-color); color: #fff; transition: all 0.3s; display: none; }
-        .action-button.show { display: inline-block; }
+        #learn-section {
+            text-align: center;
+        }
 
-        .modal-overlay { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
-        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 2rem; border: 1px solid #888; width: 80%; max-width: 600px; border-radius: 15px; position: relative; color: var(--text-color); }
-        .close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
-        #archive-list { list-style: none; padding: 0; max-height: 400px; overflow-y: auto; }
-        #archive-list li { padding: 0.75rem; border-bottom: 1px solid #ddd; }
+        .difficulty-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 0.3rem;
+        }
+
+        .difficulty-btn {
+            flex: 1;
+            padding: 0.75rem 0;
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            color: var(--light-text-color);
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 7px;
+            transition: background-color 0.3s;
+        }
+
+        .difficulty-btn.active {
+            background-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .matching-area {
+            display: flex;
+            justify-content: space-around;
+            align-items: stretch;
+            background-color: var(--card-bg-color);
+            color: var(--text-color);
+            border-radius: 15px;
+            padding: 2rem;
+            min-height: 250px;
+            box-sizing: border-box;
+        }
+
+        .matching-column {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 45%;
+        }
+
+        .match-item {
+            padding: 1rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            font-weight: 500;
+            min-height: 2.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .match-item:hover {
+            background-color: rgba(54, 116, 181, 0.1);
+        }
+
+        .match-item.selected {
+            background-color: var(--selected-color);
+            border-color: var(--selected-color);
+            color: #fff;
+        }
+
+        .match-item.correct {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+            color: #fff;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .match-item.incorrect {
+            animation: shake 0.5s;
+            background-color: var(--error-color);
+            border-color: var(--error-color);
+            color: #fff;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        #feedback {
+            margin-top: 1rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            height: 20px;
+        }
+
+        .main-controls {
+            margin-top: 1rem;
+        }
+
+        .action-button {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 8px;
+            border: none;
+            background-color: var(--selected-color);
+            color: #fff;
+            transition: all 0.3s;
+            display: none;
+        }
+
+        .action-button.show {
+            display: inline-block;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 2rem;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 15px;
+            position: relative;
+            color: var(--text-color);
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #archive-list {
+            list-style: none;
+            padding: 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        #archive-list li {
+            padding: 0.75rem;
+            border-bottom: 1px solid #ddd;
+        }
 
         @media (max-width: 600px) {
-            .difficulty-selector { flex-wrap: wrap; }
-            .difficulty-btn { font-size: 0.9rem; flex-basis: 50%; }
-            .matching-area { flex-direction: column; gap: 1rem; }
-            .matching-column { width: 100%; }
-            .modal-content { width: 90%; margin: 20% auto; }
+            .difficulty-selector {
+                flex-wrap: wrap;
+            }
+
+            .difficulty-btn {
+                font-size: 0.9rem;
+                flex-basis: 50%;
+            }
+
+            .matching-area {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .matching-column {
+                width: 100%;
+            }
+
+            .modal-content {
+                width: 90%;
+                margin: 20% auto;
+            }
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 120px;
+            background: linear-gradient(180deg, var(--selected-color), var(--primary-color), transparent);
+            border-radius: 2px;
+            opacity: 0.7;
+        }
+
+        .tools-menu h3 {
+            color: var(--selected-color);
+            border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+            padding-bottom: 0.5rem;
+            margin-top: 0;
+        }
+        .tools-menu p{
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .tools-menu button{
+            width: 100%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--primary-color);
+            color: var(--light-text-color);
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .tools-menu button:hover{
+            background-color: var(--selected-color);
         }
     </style>
 </head>
+
 <body>
 
+
+    <div class="menu-icon" id="menu-icon">
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+    </div>
+    <div class="tools-menu" id="tools-menu"></div>
     <div class="container">
-        <div class="menu-icon" id="menu-icon">
-            <div class="line"></div><div class="line"></div><div class="line"></div>
-        </div>
-        <div class="tools-menu" id="tools-menu"></div>
         <header>
             <h1>LingoFlow</h1>
             <p>Master Words, Level by Level</p>
@@ -143,12 +393,12 @@
             },
 
             elements: {},
-            
+
             // The full vocabulary remains the same
             gameData: {
-                easy: [{id:1,word:"học",meaning:"to learn"},{id:2,word:"quyển sách",meaning:"a book"},{id:3,word:"ăn",meaning:"to eat"},{id:4,word:"nước",meaning:"water"},{id:5,word:"nhà",meaning:"house"},{id:6,word:"giáo viên",meaning:"teacher"},{id:30,word:"con chó",meaning:"dog"},{id:31,word:"con mèo",meaning:"cat"},{id:32,word:"đi",meaning:"to go"},{id:33,word:"trường học",meaning:"school"},{id:34,word:"màu đỏ",meaning:"red color"},{id:35,word:"số một",meaning:"number one"},{id:36,word:"cái cây",meaning:"tree"},{id:37,word:"bóng đá",meaning:"soccer"},{id:38,word:"mặt trời",meaning:"sun"},{id:100,word:"quả táo",meaning:"apple"},{id:101,word:"cái bút",meaning:"pen"},{id:102,word:"lớn",meaning:"big"},{id:103,word:"nhỏ",meaning:"small"},{id:104,word:"chạy",meaning:"to run"},{id:105,word:"ngủ",meaning:"to sleep"},{id:106,word:"hạnh phúc",meaning:"happy"},{id:107,word:"buồn",meaning:"sad"},{id:108,word:"màu xanh",meaning:"blue color"},{id:109,word:"bạn",meaning:"you / friend"}],
-                medium: [{id:10,word:"sinh viên",meaning:"student"},{id:11,word:"viết",meaning:"to write"},{id:12,word:"ngon",meaning:"delicious"},{id:13,word:"bệnh viện",meaning:"hospital"},{id:14,word:"máy tính",meaning:"computer"},{id:15,word:"bạn bè",meaning:"friends"},{id:40,word:"gia đình",meaning:"family"},{id:41,word:"hôm nay",meaning:"today"},{id:42,word:"uống",meaning:"to drink"},{id:43,word:"nhà hàng",meaning:"restaurant"},{id:44,word:"xinh đẹp",meaning:"beautiful"},{id:45,word:"buổi sáng",meaning:"morning"},{id:46,word:"thành phố",meaning:"city"},{id:47,word:"nói chuyện",meaning:"to talk"},{id:48,word:"thông minh",meaning:"intelligent"},{id:200,word:"thời tiết",meaning:"weather"},{id:201,word:"mua sắm",meaning:"to shop"},{id:202,word:"đắt",meaning:"expensive"},{id:203,word:"rẻ",meaning:"cheap"},{id:204,word:"sở thích",meaning:"hobby"},{id:205,word:"du lịch",meaning:"to travel"},{id:206,word:"bận rộn",meaning:"busy"},{id:207,word:"sân bay",meaning:"airport"},{id:208,word:"cảnh sát",meaning:"police"},{id:209,word:"luôn luôn",meaning:"always"}],
-                hard: [{id:20,word:"Bạn có khỏe không?",meaning:"How are you?"},{id:21,word:"Tôi đói bụng",meaning:"I am hungry"},{id:22,word:"Hẹn gặp lại",meaning:"See you later"},{id:23,word:"Thời tiết hôm nay thế nào?",meaning:"How is the weather today?"},{id:24,word:"Chúc một ngày tốt lành",meaning:"Have a nice day"},{id:25,word:"Tên của bạn là gì?",meaning:"What is your name?"},{id:50,word:"Cái này giá bao nhiêu?",meaning:"How much does this cost?"},{id:51,word:"Nhà vệ sinh ở đâu?",meaning:"Where is the bathroom?"},{id:52,word:"Tôi không hiểu",meaning:"I don't understand"},{id:53,word:"Rất vui được gặp bạn",meaning:"Pleased to meet you"},{id:54,word:"Bạn có thể nói chậm hơn không?",meaning:"Can you speak slower?"},{id:55,word:"Chúc may mắn",meaning:"Good luck"},{id:56,word:"Mấy giờ rồi?",meaning:"What time is it?"},{id:57,word:"Tôi cần sự giúp đỡ",meaning:"I need help"},{id:58,word:"Sân bay ở đâu?",meaning:"Where is the airport?"},{id:300,word:"Tôi có thể thanh toán bằng thẻ tín dụng không?",meaning:"Can I pay by credit card?"},{id:301,word:"Vui lòng cho tôi xem thực đơn",meaning:"Please show me the menu"},{id:302,word:"Điều đó thật thú vị",meaning:"That is very interesting"},{id:303,word:"Tôi bị lạc đường",meaning:"I am lost"},{id:304,word:"Bạn có bất kỳ khuyến nghị nào không?",meaning:"Do you have any recommendations?"},{id:305,word:"Nó phụ thuộc vào hoàn cảnh",meaning:"It depends on the situation"},{id:306,word:"Đừng lo lắng về nó",meaning:"Don't worry about it"},{id:307,word:"Bạn có thể lặp lại điều đó được không?",meaning:"Could you please repeat that?"},{id:308,word:"Tôi đồng ý với bạn",meaning:"I agree with you"},{id:309,word:"Đó là một ý kiến hay",meaning:"That is a good idea"}]
+                easy: [{ id: 1, word: "học", meaning: "to learn" }, { id: 2, word: "quyển sách", meaning: "a book" }, { id: 3, word: "ăn", meaning: "to eat" }, { id: 4, word: "nước", meaning: "water" }, { id: 5, word: "nhà", meaning: "house" }, { id: 6, word: "giáo viên", meaning: "teacher" }, { id: 30, word: "con chó", meaning: "dog" }, { id: 31, word: "con mèo", meaning: "cat" }, { id: 32, word: "đi", meaning: "to go" }, { id: 33, word: "trường học", meaning: "school" }, { id: 34, word: "màu đỏ", meaning: "red color" }, { id: 35, word: "số một", meaning: "number one" }, { id: 36, word: "cái cây", meaning: "tree" }, { id: 37, word: "bóng đá", meaning: "soccer" }, { id: 38, word: "mặt trời", meaning: "sun" }, { id: 100, word: "quả táo", meaning: "apple" }, { id: 101, word: "cái bút", meaning: "pen" }, { id: 102, word: "lớn", meaning: "big" }, { id: 103, word: "nhỏ", meaning: "small" }, { id: 104, word: "chạy", meaning: "to run" }, { id: 105, word: "ngủ", meaning: "to sleep" }, { id: 106, word: "hạnh phúc", meaning: "happy" }, { id: 107, word: "buồn", meaning: "sad" }, { id: 108, word: "màu xanh", meaning: "blue color" }, { id: 109, word: "bạn", meaning: "you / friend" }],
+                medium: [{ id: 10, word: "sinh viên", meaning: "student" }, { id: 11, word: "viết", meaning: "to write" }, { id: 12, word: "ngon", meaning: "delicious" }, { id: 13, word: "bệnh viện", meaning: "hospital" }, { id: 14, word: "máy tính", meaning: "computer" }, { id: 15, word: "bạn bè", meaning: "friends" }, { id: 40, word: "gia đình", meaning: "family" }, { id: 41, word: "hôm nay", meaning: "today" }, { id: 42, word: "uống", meaning: "to drink" }, { id: 43, word: "nhà hàng", meaning: "restaurant" }, { id: 44, word: "xinh đẹp", meaning: "beautiful" }, { id: 45, word: "buổi sáng", meaning: "morning" }, { id: 46, word: "thành phố", meaning: "city" }, { id: 47, word: "nói chuyện", meaning: "to talk" }, { id: 48, word: "thông minh", meaning: "intelligent" }, { id: 200, word: "thời tiết", meaning: "weather" }, { id: 201, word: "mua sắm", meaning: "to shop" }, { id: 202, word: "đắt", meaning: "expensive" }, { id: 203, word: "rẻ", meaning: "cheap" }, { id: 204, word: "sở thích", meaning: "hobby" }, { id: 205, word: "du lịch", meaning: "to travel" }, { id: 206, word: "bận rộn", meaning: "busy" }, { id: 207, word: "sân bay", meaning: "airport" }, { id: 208, word: "cảnh sát", meaning: "police" }, { id: 209, word: "luôn luôn", meaning: "always" }],
+                hard: [{ id: 20, word: "Bạn có khỏe không?", meaning: "How are you?" }, { id: 21, word: "Tôi đói bụng", meaning: "I am hungry" }, { id: 22, word: "Hẹn gặp lại", meaning: "See you later" }, { id: 23, word: "Thời tiết hôm nay thế nào?", meaning: "How is the weather today?" }, { id: 24, word: "Chúc một ngày tốt lành", meaning: "Have a nice day" }, { id: 25, word: "Tên của bạn là gì?", meaning: "What is your name?" }, { id: 50, word: "Cái này giá bao nhiêu?", meaning: "How much does this cost?" }, { id: 51, word: "Nhà vệ sinh ở đâu?", meaning: "Where is the bathroom?" }, { id: 52, word: "Tôi không hiểu", meaning: "I don't understand" }, { id: 53, word: "Rất vui được gặp bạn", meaning: "Pleased to meet you" }, { id: 54, word: "Bạn có thể nói chậm hơn không?", meaning: "Can you speak slower?" }, { id: 55, word: "Chúc may mắn", meaning: "Good luck" }, { id: 56, word: "Mấy giờ rồi?", meaning: "What time is it?" }, { id: 57, word: "Tôi cần sự giúp đỡ", meaning: "I need help" }, { id: 58, word: "Sân bay ở đâu?", meaning: "Where is the airport?" }, { id: 300, word: "Tôi có thể thanh toán bằng thẻ tín dụng không?", meaning: "Can I pay by credit card?" }, { id: 301, word: "Vui lòng cho tôi xem thực đơn", meaning: "Please show me the menu" }, { id: 302, word: "Điều đó thật thú vị", meaning: "That is very interesting" }, { id: 303, word: "Tôi bị lạc đường", meaning: "I am lost" }, { id: 304, word: "Bạn có bất kỳ khuyến nghị nào không?", meaning: "Do you have any recommendations?" }, { id: 305, word: "Nó phụ thuộc vào hoàn cảnh", meaning: "It depends on the situation" }, { id: 306, word: "Đừng lo lắng về nó", meaning: "Don't worry about it" }, { id: 307, word: "Bạn có thể lặp lại điều đó được không?", meaning: "Could you please repeat that?" }, { id: 308, word: "Tôi đồng ý với bạn", meaning: "I agree with you" }, { id: 309, word: "Đó là một ý kiến hay", meaning: "That is a good idea" }]
             },
 
             init() {
@@ -174,10 +424,10 @@
                 this.elements.nextLevelBtn.addEventListener('click', this._loadNextRound.bind(this));
                 this.elements.menuIcon.addEventListener('click', this._toggleMenu.bind(this));
                 this.elements.closeArchiveBtn.addEventListener('click', this._closeArchive.bind(this));
-                
+
                 this.elements.wordsColumn.addEventListener('click', this._handleItemClick.bind(this));
                 this.elements.meaningsColumn.addEventListener('click', this._handleItemClick.bind(this));
-                
+
                 window.addEventListener('click', (event) => {
                     if (event.target === this.elements.archiveModal) this._closeArchive();
                     if (this.elements.menu.classList.contains('show') && !this.elements.menu.contains(event.target) && !this.elements.menuIcon.contains(event.target)) {
@@ -192,10 +442,10 @@
             _loadNextRound() {
                 this.state.matchesFound = 0;
                 this.state.selectedItem = null;
-                
+
                 // 1. Get the pool of all words for the current difficulty.
                 const wordPool = this.gameData[this.state.currentDifficulty];
-                
+
                 // 2. Filter out words that have already been mastered in this session.
                 const unseenWords = wordPool.filter(word => !this.state.masteredWordIds.has(word.id));
 
@@ -221,7 +471,7 @@
                 this.elements.meaningsColumn.innerHTML = '';
                 this._updateFeedback('');
                 this.elements.nextLevelBtn.classList.remove('show');
-                
+
                 const createMatchItem = (itemData) => {
                     const item = document.createElement('div');
                     item.className = 'match-item';
@@ -243,14 +493,14 @@
 
                 this.state.currentDifficulty = target.dataset.difficulty;
                 // **CRITICAL:** Reset progress when changing difficulty.
-                this.state.masteredWordIds.clear(); 
-                
+                this.state.masteredWordIds.clear();
+
                 document.querySelectorAll('.difficulty-btn').forEach(btn => btn.classList.remove('active'));
                 target.classList.add('active');
-                
+
                 this._loadNextRound();
             },
-            
+
             _handleItemClick(event) {
                 const item = event.target.closest('.match-item');
                 if (!item || item.classList.contains('correct')) return;
@@ -291,12 +541,12 @@
                     }
                 }
             },
-            
+
             _updateFeedback(message, isSuccess = false) {
                 this.elements.feedback.textContent = message;
                 this.elements.feedback.style.color = isSuccess ? 'var(--success-color)' : 'var(--light-text-color)';
             },
-            
+
             _shuffle: (array) => array.sort(() => Math.random() - 0.5),
 
             // --- Menu and Modal Methods (Unchanged) ---
@@ -318,7 +568,7 @@
                     </div>`;
                 document.getElementById('archive-btn-dynamic').addEventListener('click', this._openArchive.bind(this));
             },
-            
+
             _openArchive() {
                 this.elements.archiveList.innerHTML = '';
                 this.elements.menu.classList.remove('show');
@@ -345,4 +595,5 @@
 
     </script>
 </body>
+
 </html>
